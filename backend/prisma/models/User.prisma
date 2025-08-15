@@ -1,0 +1,8 @@
+model User{
+    user_id String @id @default(uuid())
+    user_username String
+    user_email String @unique
+    user_password String
+    user_role String 
+    relationUserRole Role @relation(fields: [user_role], references: [role_id])
+}

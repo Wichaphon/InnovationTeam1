@@ -1,0 +1,55 @@
+
+
+services:
+  backend:
+    depends_on:
+      db:
+        condition: service_healthy
+    container_name: backend-apps
+    build: ./backend
+    ports:
+      - "8000:5000"
+    networks:
+      - prisma-network
+
+  frontend:
+    container_name: frontend-apps
+    build: ./frontend
+    ports:
+      - "5173:5173"
+  
+  db:
+    container_name: postgresQL15
+    image: postgres:15
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb 
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    networks:
+      - prisma-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d mydb"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: postgres -c listen_addresses='*'
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+      prisma-network:
+        name: prisma-network
+
+volumes:
+  postgres_data:
+  
+   

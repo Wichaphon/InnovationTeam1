@@ -1,0 +1,5 @@
+model Role{
+    role_id        String     @id @default(uuid())
+    role_name String 
+    user User[]
+}
