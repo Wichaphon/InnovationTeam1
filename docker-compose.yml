@@ -26,6 +26,7 @@ services:
       - ./.env             
     ports:
       - "${PORT}:${PORT}"    #mapportจาก.env 
+      - "5555:5555"
     volumes:
       - ./backend:/app
       - /app/node_modules

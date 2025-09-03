@@ -40,3 +40,7 @@ coverage/
 
 # Vite cache
 .vite/
+
+
+#prisma
+/src/generated/prisma
