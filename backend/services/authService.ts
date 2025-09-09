@@ -133,8 +133,8 @@ async function registerUser({ email, password, fname, lname }) {
     },
     include: { role: true },
   });
-  const { accessToken, refreshToken } = await issueTokensForUser(user);
-  return { user: sanitizeUser(user), token: accessToken, refreshToken };
+  // Do NOT issue tokens on registration; return only created user
+  return { user: sanitizeUser(user) };
 }
 
 async function loginUser({ email, password }) {

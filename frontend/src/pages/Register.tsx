@@ -34,12 +34,8 @@ export default function Register({ }: RegisterProps) {
     setError('')
 
     try {
-      const data = await registerRequest(email, password, fname, lname)
-      // After registration, behave like logged-in: store tokens via existing flow
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('refreshToken', data.refreshToken)
-      // Let App useEffect pick up new tokens and route accordingly
-      window.location.href = '/'
+      await registerRequest(email, password, fname, lname)
+      window.location.replace('/')
     } catch (e) {
       const message = e instanceof Error ? e.message : 'สมัครสมาชิกไม่สำเร็จ'
       setError(message)

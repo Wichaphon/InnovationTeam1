@@ -36,7 +36,8 @@ async function register(req, res) {
   try {
     const { email, password, fname, lname } = req.body;
     const result = await authService.registerUser({ email, password, fname, lname });
-    return res.status(201).json(result);
+    // Return only user object, no tokens on registration
+    return res.status(201).json({ user: result.user });
   } catch (e) {
     const status = e.status || 500;
     return res.status(status).json({ message: e.message || 'Registration failed' });
