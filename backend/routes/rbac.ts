@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const { authenticate, requireRole } = require('../middleware/auth');
-const {
+import express from 'express';
+import { authenticate, requireRole } from '../middleware/auth';
+import {
   validateCreateRole,
   validateIdParams,
   validateSetUserRoleParams,
@@ -13,7 +12,8 @@ const {
   setUserRole,
   getUserRole,
   createUser,
-} = require('../controllers/rbacController');
+} from '../controllers/rbacController';
+const router = express.Router();
 
 // Roles
 router.get('/roles', authenticate, requireRole('Admin'), listRoles);
@@ -27,4 +27,4 @@ router.post('/users/:userId/roles/:roleId', authenticate, requireRole('Admin'), 
 // Admin create user with role
 router.post('/users', authenticate, requireRole('Admin'), validateCreateUser, createUser);
 
-module.exports = router;
+export default router;

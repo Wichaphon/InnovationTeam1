@@ -1,7 +1,7 @@
 import passport from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import crypto from 'crypto'
-const prisma = require('../lib/prisma')
+import prisma from '../lib/prisma'
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || ''
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || ''
@@ -44,7 +44,7 @@ passport.use(
           const fallbackEmail = email || `${providerAccountId}@${provider}.local`
           const randomPassword = crypto.randomBytes(32).toString('hex')
 
-          const argon2 = require('argon2')
+          const { default: argon2 } = await import('argon2')
           const passwordHash = await argon2.hash(randomPassword)
           const defaultRole = await prisma.role.upsert({ where: { name: 'User' }, update: {}, create: { name: 'User' } })
           user = await prisma.user.create({
@@ -99,6 +99,6 @@ passport.deserializeUser(async (id: string, done) => {
   }
 })
 
-;(module as any).exports = passport
+export default passport
 
 

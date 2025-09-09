@@ -1,7 +1,7 @@
-const argon2 = require('argon2');
-const jwt = require('jsonwebtoken');
-const prisma = require('../lib/prisma');
-const redis = require('../lib/redis').default;
+import argon2 from 'argon2';
+import jwt from 'jsonwebtoken';
+import prisma from '../lib/prisma';
+import redis from '../lib/redis';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
@@ -164,7 +164,7 @@ async function getUserById(userId) {
   return user ? sanitizeUser(user) : null;
 }
 
-module.exports = {
+export {
   registerUser,
   loginUser,
   getUserById,

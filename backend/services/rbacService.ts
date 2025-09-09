@@ -1,5 +1,5 @@
-const prisma = require('../lib/prisma');
-const argon2 = require('argon2');
+import prisma from '../lib/prisma';
+import argon2 from 'argon2';
 
 async function listRoles() {
   return prisma.role.findMany();
@@ -40,7 +40,7 @@ async function createUserWithRole({ email, password, fname, lname, roleId }) {
   return safe;
 }
 
-module.exports = {
+export {
   listRoles,
   createRole,
   deleteRole,

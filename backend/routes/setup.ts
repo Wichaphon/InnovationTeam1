@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { validateSeed, seed } from '../controllers/setupController';
 const router = express.Router();
-const { validateSeed, seed } = require('../controllers/setupController');
 
 router.post('/seed', validateSeed, seed);
 
-module.exports = router;
+export default router;

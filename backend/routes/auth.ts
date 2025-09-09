@@ -1,10 +1,9 @@
-const express = require('express');
-const router = express.Router();
-const { authenticate } = require('../middleware/auth');
-const { loginLimiter } = require('../middleware/rateLimit');
-const { idempotency } = require('../middleware/idempotency');
-const passport = require('passport');
-const {
+import express from 'express';
+import passport from 'passport';
+import { authenticate } from '../middleware/auth';
+import { loginLimiter } from '../middleware/rateLimit';
+import { idempotency } from '../middleware/idempotency';
+import {
   validateRegister,
   validateLogin,
   validateRefresh,
@@ -16,10 +15,7 @@ const {
   logout,
   googleAuth,
   googleCallbackHandler,
-} = require('../controllers/authController');
-
-
-const authService = require('../services/authService');
+} from '../controllers/authController';
 
 router.post('/register', idempotency, validateRegister, register);
 router.post('/login', loginLimiter, idempotency, validateLogin, login);
@@ -36,4 +32,4 @@ router.get('/google/callback', (req, res, next) => {
 });
 router.get('/google/failure', (_req, res) => res.status(401).json({ message: 'Google authentication failed' }));
 
-module.exports = router;
+export default router;

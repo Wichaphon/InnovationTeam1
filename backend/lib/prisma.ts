@@ -1,18 +1,17 @@
-let PrismaClient;
-try {
-  ({ PrismaClient } = require('../src/generated/prisma'));
-} catch (e) {
-  ({ PrismaClient } = require('@prisma/client'));
-}
+import * as Generated from '../src/generated/prisma'
+import { PrismaClient as PrismaClientFromPackage } from '@prisma/client'
 
-let prisma;
+// Prefer local generated client if available (dev), else fall back to package
+const PrismaClient = (Generated as any)?.PrismaClient || PrismaClientFromPackage
+
+let prisma: any
 if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient();
+  prisma = new PrismaClient()
 } else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient();
+  if (!(global as any).prisma) {
+    ;(global as any).prisma = new PrismaClient()
   }
-  prisma = global.prisma;
+  prisma = (global as any).prisma
 }
 
-module.exports = prisma;
+export default prisma

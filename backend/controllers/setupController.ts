@@ -1,5 +1,5 @@
-const { body, validationResult } = require('express-validator');
-const { seedBaseData } = require('../services/setupService');
+import { body, validationResult } from 'express-validator';
+import { seedBaseData } from '../services/setupService';
 
 const validateSeed = [
   body('adminEmail').isEmail(),
@@ -25,4 +25,4 @@ async function seed(req, res) {
   }
 }
 
-module.exports = { validateSeed, seed };
+export { validateSeed, seed };

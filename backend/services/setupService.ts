@@ -1,5 +1,5 @@
-const argon2 = require('argon2');
-const prisma = require('../lib/prisma');
+import argon2 from 'argon2';
+import prisma from '../lib/prisma';
 
 async function seedBaseData({ adminEmail, adminPassword, adminName }) {
 
@@ -49,4 +49,4 @@ async function seedBaseData({ adminEmail, adminPassword, adminName }) {
   return { ok: true, adminEmail };
 }
 
-module.exports = { seedBaseData };
+export { seedBaseData };

@@ -18,6 +18,6 @@ function buildOAuthErrorRedirect(code: string): string {
   return url.toString();
 }
 
-module.exports = { buildOAuthSuccessRedirect, buildOAuthErrorRedirect };
+export { buildOAuthSuccessRedirect, buildOAuthErrorRedirect };
 
 

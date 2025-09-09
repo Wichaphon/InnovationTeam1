@@ -1,19 +1,19 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var passport = require('./lib/passport');
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import passport from './lib/passport';
+import indexRouter from './routes/index';
+import usersRouter from './routes/users';
+import authRouter from './routes/auth';
+import rbacRouter from './routes/rbac';
+import setupRouter from './routes/setup';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var authRouter = require('./routes/auth');
-var rbacRouter = require('./routes/rbac');
-var setupRouter = require('./routes/setup');
-var cors = require('cors');
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
-
-var app = express();
+const app = express();
 
 app.use(cors());
 app.use(logger('dev'));
@@ -29,4 +29,4 @@ app.use('/api/auth', authRouter);
 app.use('/api/rbac', rbacRouter);
 app.use('/api/setup', setupRouter);
 
-module.exports = app;
+export default app;

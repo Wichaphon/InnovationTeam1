@@ -4,14 +4,8 @@ import http from 'http'
 import debugLib from 'debug'
 import path from 'path'
 import dotenv from 'dotenv'
-
-// Load env
-dotenv.config({ path: path.join(__dirname, '..', '..', '.env') })
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const app = require('../app')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { seedBaseData } = require('../services/setupService')
+import app from '../app'
+import { seedBaseData } from '../services/setupService'
 
 const debug = debugLib('backend:server')
 

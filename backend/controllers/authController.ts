@@ -1,7 +1,8 @@
-const { body, validationResult } = require('express-validator');
-const authService = require('../services/authService');
-const passport = require('passport');
-const { buildOAuthSuccessRedirect, buildOAuthErrorRedirect } = require('../services/oauthService');
+import { body, validationResult } from 'express-validator';
+import * as authService from '../services/authService';
+import passport from 'passport';
+import { buildOAuthSuccessRedirect, buildOAuthErrorRedirect } from '../services/oauthService';
+import redis from '../lib/redis';
 
 const validateRegister = [
   body('email').isEmail().withMessage('Valid email required'),
@@ -60,7 +61,6 @@ async function login(req, res) {
 async function me(req, res) {
   try {
     const cacheKey = `me:${req.user.sub}`;
-    const redis = require('../lib/redis').default;
     const cached = await redis.get(cacheKey);
     if (cached) return res.json({ user: JSON.parse(cached) });
     const user = await authService.getUserById(req.user.sub);
@@ -95,7 +95,7 @@ async function logout(req, res) {
   }
 }
 
-module.exports = {
+export {
   validateRegister,
   validateLogin,
   validateRefresh,
@@ -105,19 +105,21 @@ module.exports = {
   me,
   refresh,
   logout,
-  googleAuth: passport.authenticate('google', { scope: ['profile', 'email'], accessType: 'offline', prompt: 'consent' }),
-  async googleCallbackHandler(err, user, info, req, res, next) {
-    try {
-      if (info && (info.code === 'no_linked_user' || info.message === 'NO_LINKED_USER')) {
-        return res.redirect(302, buildOAuthErrorRedirect('no_linked_user'));
-      }
-      if (err) return next(err);
-      if (!user) return res.redirect(302, buildOAuthErrorRedirect('auth_failed'));
-      const { accessToken, refreshToken } = await authService.issueTokensForUser(user);
-      const role = user?.role?.name || null;
-      return res.redirect(302, buildOAuthSuccessRedirect(accessToken, refreshToken, role));
-    } catch (e) {
-      return next(e);
-    }
-  },
 };
+
+export const googleAuth = passport.authenticate('google', { scope: ['profile', 'email'], accessType: 'offline', prompt: 'consent' });
+
+export async function googleCallbackHandler(err, user, info, req, res, next) {
+  try {
+    if (info && (info.code === 'no_linked_user' || info.message === 'NO_LINKED_USER')) {
+      return res.redirect(302, buildOAuthErrorRedirect('no_linked_user'));
+    }
+    if (err) return next(err);
+    if (!user) return res.redirect(302, buildOAuthErrorRedirect('auth_failed'));
+    const { accessToken, refreshToken } = await authService.issueTokensForUser(user);
+    const role = user?.role?.name || null;
+    return res.redirect(302, buildOAuthSuccessRedirect(accessToken, refreshToken, role));
+  } catch (e) {
+    return next(e);
+  }
+}

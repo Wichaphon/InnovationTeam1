@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const prisma = require('../lib/prisma');
-const redis = require('../lib/redis').default;
+import jwt from 'jsonwebtoken';
+import prisma from '../lib/prisma';
+import redis from '../lib/redis';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 
@@ -40,4 +40,4 @@ function requireRole(...requiredRoles) {
   };
 }
 
-module.exports = { authenticate, requireRole };
+export { authenticate, requireRole };

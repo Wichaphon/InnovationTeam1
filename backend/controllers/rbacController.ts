@@ -1,5 +1,5 @@
-const { body, param, validationResult } = require('express-validator');
-const rbacService = require('../services/rbacService');
+import { body, param, validationResult } from 'express-validator';
+import * as rbacService from '../services/rbacService';
 
 function handleValidation(req, res) {
   const errors = validationResult(req);
@@ -66,7 +66,7 @@ async function createUser(req, res) {
   }
 }
 
-module.exports = {
+export {
   // validators
   validateCreateRole,
   validateIdParams,
