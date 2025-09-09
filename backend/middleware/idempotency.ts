@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import redis from '../lib/redis'
 
-// Idempotency-Key header: caches response status+body for a short TTL
 export async function idempotency(req: Request, res: Response, next: NextFunction) {
   const key = req.headers['idempotency-key'] as string | undefined
   if (!key) return next()
