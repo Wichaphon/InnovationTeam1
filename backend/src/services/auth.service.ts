@@ -99,3 +99,11 @@ export const getUserByTokenVersion = async (userId: number, tokenVersion: number
     },
   });
 };
+
+export const logoutService = async (userId: number) => {
+  
+  await prisma.user.update({
+    where: { id: userId },
+    data: { tokenVersion: { increment: 1 } },
+  });
+};

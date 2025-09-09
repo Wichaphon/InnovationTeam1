@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { RegisterBody } from "../interfaces/auth.interface";
-import { findUserByEmail, registerUser, loginUser, getUserProfile , getUserByTokenVersion } from "../services/auth.service";
+import { findUserByEmail, registerUser, loginUser, getUserProfile , getUserByTokenVersion, logoutService } from "../services/auth.service";
 import { setRefreshCookie, signAccess, signRefresh , verifyRefresh } from "../lib/jwt";
 
 export const register = async (req: Request<{}, any, RegisterBody>, res: Response) => {
@@ -100,3 +100,20 @@ export const refreshToken = async (req: any, res: Response) => {
   }
 };
 
+export const logout = async (req: any, res: Response) => {
+  try {
+    const userId = req.userId as string;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    await logoutService(Number(userId));
+
+    res.clearCookie('refresh_token');
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "An unexpected error occurred" });
+  }
+};
