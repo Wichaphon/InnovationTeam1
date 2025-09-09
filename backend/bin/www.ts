@@ -8,7 +8,6 @@ import dotenv from 'dotenv'
 // Load env
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') })
 
-// Import JS app (allowJs is enabled)
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const app = require('../app')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29,7 +28,6 @@ const server = http.createServer(app)
     const adminName = process.env.ADMIN_NAME || 'Admin'
     await seedBaseData({ adminEmail, adminPassword, adminName })
   } catch (e) {
-    // Do not crash server if seed fails (e.g., DB already has data)
     console.warn('[setup] seedBaseData skipped or failed:', (e as Error)?.message)
   } finally {
     server.listen(port)
