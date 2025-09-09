@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { RegisterBody } from "../interfaces/auth.interface";
-import { findUserByEmail, registerUser, loginUser, getUserProfile } from "../services/auth.service";
-import { setRefreshCookie } from "../lib/jwt";
+import { findUserByEmail, registerUser, loginUser, getUserProfile , getUserByTokenVersion } from "../services/auth.service";
+import { setRefreshCookie, signAccess, signRefresh , verifyRefresh } from "../lib/jwt";
 
 export const register = async (req: Request<{}, any, RegisterBody>, res: Response) => {
   try {
@@ -74,4 +74,29 @@ export const getProfile = async (req: any, res: Response) => {
   }
 };
 
+export const refreshToken = async (req: any, res: Response) => {
+  try {
+    const { refresh_token } = req.cookies;
+    if (!refresh_token) {
+      return res.status(401).json({ message: "No refresh token found" });
+    }
+
+    const payload = verifyRefresh(refresh_token);
+    const user = await getUserByTokenVersion(Number(payload.sub), payload.ver);
+
+    if (!user) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    const accessToken = signAccess(user.id, user.role.role_name);
+  
+    const newRefreshToken = signRefresh(user.id, user.tokenVersion);
+
+    setRefreshCookie(res, newRefreshToken);
+
+    return res.status(200).json({ accessToken });
+  } catch (err: any) {
+    return res.status(401).json({ message: "Invalid or expired refresh token" });
+  }
+};
 

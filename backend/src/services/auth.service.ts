@@ -81,3 +81,21 @@ export const getUserProfile = async (userId: number) => {
     role: userWithRole.role.role_name,
   };
 };
+
+export const getUserByTokenVersion = async (userId: number, tokenVersion: number) => {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+      tokenVersion: tokenVersion, 
+    },
+    select: {
+      id: true,
+      tokenVersion: true,
+      role: {
+        select: {
+          role_name: true,
+        },
+      },
+    },
+  });
+};
