@@ -1,10 +1,11 @@
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
+import type { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 import prisma from '../lib/prisma';
 import redis from '../lib/redis';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
+const JWT_SECRET: Secret = process.env.JWT_SECRET || 'dev_secret_change_me';
+const JWT_EXPIRES_IN: SignOptions['expiresIn'] = (process.env.JWT_EXPIRES_IN || '15m') as any;
 const REFRESH_TOKEN_TTL_DAYS = 7;
 
 async function getUserWithRoleByEmail(email) {
@@ -22,14 +23,14 @@ function signToken(user) {
 }
 
 async function createRefreshToken(userId) {
-  // Simple random token using JWT for entropy, but stored opaque in DB
+  // Simple random token using JWT for entropy, but stored in DB
   const raw = jwt.sign({ sub: userId, typ: 'refresh' }, JWT_SECRET, { expiresIn: `${REFRESH_TOKEN_TTL_DAYS}d` });
   const token = raw; // could hash before storing for extra security
   await prisma.refreshToken.create({ data: { token, userId } });
   // Cache whitelist mapping in Redis with TTL until token expiry
   try {
-    const decoded = jwt.decode(token);
-    const exp = decoded?.exp ? decoded.exp : 0;
+    const decoded = jwt.decode(token) as JwtPayload | null;
+    const exp = typeof decoded?.exp === 'number' ? decoded.exp : 0;
     const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
     if (ttl > 0) await redis.set(`rt:token:${token}`, String(userId), 'EX', ttl);
   } catch (_) {}
@@ -63,7 +64,7 @@ async function rotateRefreshToken(oldToken) {
     const user = await prisma.user.findUnique({ where: { id: userIdFromCache }, include: { role: true } });
     // Blacklist old
     try {
-      const decoded = jwt.decode(oldToken); const exp = decoded?.exp ? decoded.exp : 0; const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
+      const decoded = jwt.decode(oldToken) as JwtPayload | null; const exp = typeof decoded?.exp === 'number' ? decoded.exp : 0; const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
       if (ttl > 0) await redis.set(`rt:blacklist:${oldToken}`, '1', 'EX', ttl);
       await redis.del(`rt:token:${oldToken}`);
     } catch (_) {}
@@ -84,7 +85,7 @@ async function rotateRefreshToken(oldToken) {
   const user = await prisma.user.findUnique({ where: { id: existing.userId }, include: { role: true } });
   // Blacklist old and remove whitelist
   try {
-    const decoded = jwt.decode(oldToken); const exp = decoded?.exp ? decoded.exp : 0; const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
+    const decoded = jwt.decode(oldToken) as JwtPayload | null; const exp = typeof decoded?.exp === 'number' ? decoded.exp : 0; const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
     if (ttl > 0) await redis.set(`rt:blacklist:${oldToken}`, '1', 'EX', ttl);
     await redis.del(`rt:token:${oldToken}`);
   } catch (_) {}
@@ -96,7 +97,7 @@ async function revokeRefreshToken(token) {
   try { await prisma.refreshToken.delete({ where: { token } }); } catch (_) {}
   // Blacklist token and remove whitelist
   try {
-    const decoded = jwt.decode(token); const exp = decoded?.exp ? decoded.exp : 0; const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
+    const decoded = jwt.decode(token) as JwtPayload | null; const exp = typeof decoded?.exp === 'number' ? decoded.exp : 0; const ttl = Math.max(0, exp - Math.floor(Date.now() / 1000));
     if (ttl > 0) await redis.set(`rt:blacklist:${token}`, '1', 'EX', ttl);
     await redis.del(`rt:token:${token}`);
   } catch (_) {}

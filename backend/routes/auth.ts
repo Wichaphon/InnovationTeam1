@@ -17,6 +17,8 @@ import {
   googleCallbackHandler,
 } from '../controllers/authController';
 
+const router = express.Router();
+
 router.post('/register', idempotency, validateRegister, register);
 router.post('/login', loginLimiter, idempotency, validateLogin, login);
 router.get('/me', authenticate, me);
