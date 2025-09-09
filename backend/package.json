@@ -1,24 +1,33 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "start": "node ./dist/index.js",
-    "dev": "nodemon ./src/index.ts"
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node --esm src/index.ts'"
+
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "@prisma/client": "^6.15.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "react-router-dom": "^7.8.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
     "@types/node": "^24.2.1",
     "nodemon": "^3.1.10",
+    "prisma": "^6.15.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }

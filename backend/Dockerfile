@@ -13,6 +13,8 @@ RUN npm install
 # copy โค้ดทั้งหมดเข้า container
 COPY . .
 
+RUN npx prisma generate
+
 # บอกว่า container ใช้ port 5000
 EXPOSE 5000
 

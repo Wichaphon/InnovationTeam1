@@ -1,6 +1,15 @@
 version: "3.9"
 services:
+  # backend-app:
+  #     build: .
+  #     depends_on:
+  #       - db
+  #     environment:
+  #       DATABASE_URL: "postgresql://postgres:password@db:5432/mydb?schema=public"
+
   db:
+    env_file:
+      - .env
     image: postgres:15
     container_name: postgres_db
     restart: always
@@ -8,7 +17,7 @@ services:
     shm_size: 128mb
 
     ports:
-      - "5432:5432"
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
 
     # or set shared memory limit when deploy via swarm stack
     #volumes:
@@ -18,27 +27,31 @@ services:
     #      size: 134217728 # 128*2^20 bytes = 128Mb
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    
   adminer:
     image: adminer
     restart: always
     ports:
-      - 3080:8080
+      - ${ADMINER_HOSTPORT}:${ADMINER_CONPORT}
     
   backend:
+    env_file:
+      - .env
     container_name: backend-app
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     volumes:
       - ./backend:/app
       - /app/node_modules
-    command: npm run dev
+    command: sh -c "npx prisma generate && npm run dev"
 
   frontend:
     container_name: frontend-app
@@ -46,7 +59,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     volumes:
       - ./frontend:/app
       - /app/node_modules
