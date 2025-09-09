@@ -32,7 +32,7 @@ function handleValidation(req, res) {
 
 async function register(req, res) {
   const err = handleValidation(req, res);
-  if (err) return; // response already sent
+  if (err) return;
   try {
     const { email, password, fname, lname } = req.body;
     const result = await authService.registerUser({ email, password, fname, lname });

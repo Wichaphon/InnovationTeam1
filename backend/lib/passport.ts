@@ -43,7 +43,7 @@ passport.use(
           const familyName = (profile.name && profile.name.familyName) || ''
           const fallbackEmail = email || `${providerAccountId}@${provider}.local`
           const randomPassword = crypto.randomBytes(32).toString('hex')
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
+
           const argon2 = require('argon2')
           const passwordHash = await argon2.hash(randomPassword)
           const defaultRole = await prisma.role.upsert({ where: { name: 'User' }, update: {}, create: { name: 'User' } })
@@ -88,7 +88,7 @@ passport.use(
   )
 )
 
-// Session is not used; include no-op serializers for completeness
+// Session is not used
 passport.serializeUser((user: any, done) => done(null, user.id))
 passport.deserializeUser(async (id: string, done) => {
   try {

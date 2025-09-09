@@ -5,7 +5,7 @@ const argon2 = require('argon2')
 const prisma = new PrismaClient()
 
 async function main() {
-  // Ensure roles
+
   const roleUser = await prisma.role.upsert({
     where: { name: 'User' },
     update: {},
@@ -17,7 +17,6 @@ async function main() {
     create: { name: 'Admin' },
   })
 
-  // Users
   const adminPassword = await argon2.hash('Admin@123456')
   const userPassword = await argon2.hash('User@123456')
 

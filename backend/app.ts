@@ -6,7 +6,6 @@ var passport = require('./lib/passport');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var healthRouter = require('./routes/health');
 var authRouter = require('./routes/auth');
 var rbacRouter = require('./routes/rbac');
 var setupRouter = require('./routes/setup');
@@ -26,7 +25,6 @@ app.use(passport.initialize());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/health', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/rbac', rbacRouter);
 app.use('/api/setup', setupRouter);
