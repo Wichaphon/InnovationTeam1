@@ -21,7 +21,7 @@ export function signRefresh(userId: number, tokenVersion: number) {
 export function setRefreshCookie(res: Response, refreshToken: string) {
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
-    secure: true,         
+    secure: process.env.NODE_ENV === 'production',         
     sameSite: "lax",    
     path: "/auth",
     maxAge: 7 * 24 * 60 * 60 * 1000,
