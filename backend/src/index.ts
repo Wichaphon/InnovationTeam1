@@ -1,8 +1,11 @@
 import express from 'express';
 import router from './route/router.ts';
 import { initialRoles } from './controller/authcontroller.ts';
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 initialRoles()
