@@ -9,14 +9,17 @@ import { loggingMiddleware } from '@/middlewares/logging';
 import { errorHandler } from '@/middlewares/errorHandler';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+const allowsOrigins = ["http://localhost:3000", process.env.FRONT_END_URL as string]
 
 const app = express();
 app.use(loggingMiddleware);
-
+allowsOrigins.forEach(e => console.log(e)
+);
 app.use(helmet());
 
 app.use(cors({
-    origin:env.CORS_ORIGIN.split(',').map(s => s.trim()),
+    // origin:env.CORS_ORIGIN.split(',').map(s => s.trim()),
+    origin:allowsOrigins,
     credentials:true
 }));
 

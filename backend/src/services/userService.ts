@@ -47,7 +47,6 @@ export const UserService = {
         return UserRepo.findByEmail(email);
     },
 
-    // LIST (pagination)
     listUsers(page?: number, pageSize?: number) {
         return UserRepo.list(page, pageSize);
     },

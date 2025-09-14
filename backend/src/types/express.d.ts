@@ -1,4 +1,3 @@
-// src/types/express.d.ts
 import 'express-serve-static-core' // ให้แน่ใจว่าเรากำลัง augment ของ express
 
 declare global {

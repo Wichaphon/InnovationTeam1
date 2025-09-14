@@ -45,9 +45,6 @@ export const loginUser = async (userdata: loginData) => {
     const valid = await bcrypt.compare(userdata.password, user.password);
     if (!valid) throw new AppError('Invalid credentials', UNAUTHORIZED, 'INVALID_CREDENTIALS');
 
-    const role = await RoleRepo.findById(user.roleId);
-    if (!role) throw new AppError('User role not found', INTERNAL_SERVER_ERROR, 'ROLE_NOT_FOUND');
-
     const payload = { userId: user.id }
 
     const accessToken = generatedAccessToken(payload);
@@ -72,7 +69,6 @@ export const refreshSession = async (token: string) => {
             throw new AppError('Invalid refresh token', UNAUTHORIZED, 'INVALID_REFRESH_TOKEN');
         }
 
-        //rotate delete before and create newOne
         await RefreshTokenRepo.delete(token);
 
         const newPayload = { userId: claims.userId };

@@ -1,12 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { verifyAccessToken } from "@/utils/jwt.utils";
 import { UNAUTHORIZED, FORBIDDEN } from "@/constants/http";
-import config from "@/config/config";
-import { AuthedRequest, AuthPayload } from "@/constants/type";
-import { UserRepo } from "@/repos/user.repo";
+import { AuthPayload } from "@/constants/type";
 import { UserService } from "@/services/userService";
 
-const { verify } = jwt;
 
 export const auth = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers?.authorization;
@@ -20,7 +17,7 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
     if (!token) return res.sendStatus(UNAUTHORIZED);
 
     try {
-        const payload = jwt.verify(token, config.jwt.ACCESS_SECRET) as AuthPayload;
+        const payload = verifyAccessToken(token) as AuthPayload;
         req.user = payload;
         next();
     } catch (error) {
@@ -35,7 +32,7 @@ export const requireRole = (role: string) => {
       const u = await UserService.getUserByIdwithRole(req.user.userId);
       const roleName = u?.role?.name;
       if (roleName !== role) return res.status(FORBIDDEN).json({ error: "forbidden" });
-      // แนบ role ให้ controller ใช้งานต่อได้ (optional)
+
       req.user.role = roleName;
       next();
     };

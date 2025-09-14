@@ -35,6 +35,8 @@ export const register = async (req: Request, res: Response) => {
     }
 }
 
+
+
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body as loginData;
 
@@ -66,6 +68,7 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
+// use communicate with server only
 export const refresh = async (req: Request, res: Response) => {
     const raw = req.cookies?.[env.REFRESH_TOKEN_COOKIE_NAME] as string | undefined;
     if (!raw) {

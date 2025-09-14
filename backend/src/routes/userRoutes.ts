@@ -8,9 +8,9 @@ import { sendprofile } from '@/controller/user.controller';
 const userRoute = Router();
 
 userRoute.get('/profile', auth, sendprofile);
-  
-    userRoute.get('/admin-only', auth, requireRole('ADMIN'), (req, res) => {
-    return res.status(OK).json({ ok: true });
-  });
+
+// userRoute.get('/admin-only', auth, requireRole('admin'), (req, res) => {
+//     return res.status(OK).json({ ok: true });
+//   });
 
 export default userRoute;

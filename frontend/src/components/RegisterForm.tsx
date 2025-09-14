@@ -1,4 +1,3 @@
-import { set, useForm } from "react-hook-form"
 import axios from "axios"
 import { IoPerson } from "react-icons/io5";
 import { FaUserTag } from "react-icons/fa6";
@@ -12,9 +11,11 @@ import { Button } from "@/components/ui/button"
 import type React from "react";
 import { useState, type ChangeEvent } from "react";
 
-interface UserFormData{
-    fname:string;
-    lname:string;
+
+
+export interface UserFormData{
+    fname?:string;
+    lname?:string;
     email:string;
     password:string;
 }
@@ -27,7 +28,7 @@ export const RegisterForm = () => {
         email:'',
         password:'',
     });
-    const [loading,setLoading] = useState<boolean>(false);
+    const [loading,setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
@@ -40,29 +41,9 @@ export const RegisterForm = () => {
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
         setSuccess(null);
-
-        try {
-            const res = axios.post(`${process.env.API_URL}/auth/register`,formData,{
-                headers: {
-                    'Content-Type':'application/json'
-                },
-            });
-            console.log('Register Success Full', (await res).data);
-            return (await res).data;
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.error('Error', error.response?.data?.message ?? error.message);
-            }
-            else if (error instanceof Error) {
-                console.error('Error', error.message);
-              } 
-            else {
-                console.error('Unknown error', error);
-            }
-        }
     }
 
     return (
@@ -234,12 +215,6 @@ export const RegisterForm = () => {
                         By registering, you agree to our <a href="#" className="text-primary hover:underline">Privacy Policy</a>
                     </p>
                 </div>
-            </div>
-
-            <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
-                    &copy; 2023 Your Company. All rights reserved.
-                </p>
             </div>
         </div>
     )

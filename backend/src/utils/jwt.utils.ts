@@ -3,7 +3,7 @@ import { env } from "process";
 import config from "@/config/config";
 
 export const generatedAccessToken = (payload: object) => {
-    return jwt.sign(payload, config.jwt.ACCESS_SECRET, { expiresIn: '15m' });
+    return jwt.sign(payload, config.jwt.ACCESS_SECRET, { expiresIn: '1h' });
 }
 
 export const generatedRefreshToken = (payload: object) => {
