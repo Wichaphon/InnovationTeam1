@@ -2,11 +2,13 @@ import 'express-serve-static-core' // ให้แน่ใจว่าเรา
 
 declare global {
   namespace Express {
+    interface User {
+      id: string;
+      role?: string;
+    }
+
     interface Request {
-      user?: {
-        userId: string;   // cuid() จาก Prisma => string
-        role?: string;    // ใส่ไว้เผื่อ middleware เติมทีหลัง (ไม่ต้องมีใน JWT)
-      };
+      user?: User;
     }
   }
 }

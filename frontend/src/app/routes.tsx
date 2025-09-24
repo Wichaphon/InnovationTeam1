@@ -1,33 +1,40 @@
-// src/app/routes.tsx
+﻿// src/app/routes.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { LoginPage } from "@/pages/LoginPage";
-import { AccountPage } from "@/features/user/hooks/page/AccountPage";
+import { UserAccountPage } from "@/features/user/hooks/page/userAccountPage";
 import DashboardLayout from "@/components/layout/DashBoardlayout";
 import ProtectedRoute from "@/routes/ProtectedRoutes";
+import RequireRole from "@/routes/RequireRole";
+import { AdminPage } from "@/features/user/hooks/page/adminPage";
+import AuthCallback from "@/pages/AuthCallback";
 
 export default function AppRoutes() {
     return (
         <Routes>
-            {/* หน้าแรกให้ไป /register ชั่วคราว */}
             <Route path="/" element={<Navigate to="/register" replace />} />
 
             {/* Public routes */}
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<LoginPage />} />
-
-            {/* Protected area (ต้องผ่าน ProtectedRoute ก่อน) */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            
+            {/* Protected area */}
             <Route element={<ProtectedRoute />}>
-            {/* <Route> */}
-                {/* วาง DashboardLayout ไว้ตรงกลุ่ม dashboard */}
                 <Route element={<DashboardLayout />}>
-                    <Route path="/account" element={<AccountPage />} />
-                    {/* เพิ่มหน้าอื่นใต้แดชบอร์ดได้ เช่น /dashboard/settings */}
+                    <Route element={<RequireRole role="admin" />}>
+                        <Route path="/admin" element={<AdminPage />} />
+                    </Route>
+                    <Route element={<RequireRole role="user" />}>
+                        <Route path="/account" element={<UserAccountPage />} />
+                        {/* Placeholder for future nested routes, e.g. /account/settings */}
+                    </Route>
                 </Route>
             </Route>
-
             {/* 404 fallback */}
             <Route path="*" element={<Navigate to="/register" replace />} />
         </Routes>
     );
 }
+
+

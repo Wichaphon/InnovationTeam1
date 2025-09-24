@@ -10,22 +10,23 @@ import { IoLogoGithub } from "react-icons/io";
 import type React from "react";
 import { useState, type ChangeEvent } from "react";
 import axios from "axios"
-import type { UserFormData } from '@/components/RegisterForm';
+import type { UserAuthData } from '@/components/RegisterForm';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/features/user/hooks/useUser';
 
 
 export const LoginForm = () => {
     const nav = useNavigate();
-    const [formData, setFormData] = useState<UserFormData>({
+    const [formData, setFormData] = useState<UserAuthData>({
         email: "",
         password: "",
     });
-    const { login, loading} = useAuth();
+    const { login, loading, googleAuth } = useAuth();
 
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.currentTarget;
+        const { name, value } = e.currentTarget;
         setFormData(prev => ({
             ...prev,
             [name]: value,
@@ -36,9 +37,8 @@ export const LoginForm = () => {
         e.preventDefault();
 
         try {
-            await login(formData.email, formData.password);
-            nav('/account')
-            
+            await login({email:formData.email, password:formData.password} as UserAuthData);
+
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.error('Error', error.response?.data?.message ?? error.message);
@@ -67,7 +67,6 @@ export const LoginForm = () => {
 
                     <div className="p-9 pt-12 text-start">
                         <form className="space-y-6" onSubmit={onSubmit}>
-
 
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
@@ -113,11 +112,11 @@ export const LoginForm = () => {
                             </button> */}
                             <div className='px-[5rem] my-[2rem]'>
                                 <button
-                                type="submit"
-                                className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                            >
-                                {loading ? (<>Loading...</>) : "Sign In"}
-                            </button>
+                                    type="submit"
+                                    className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                                >
+                                    {loading ? (<>Loading...</>) : "Sign In"}
+                                </button>
                                 {/* <Button
                                     type="submit"
                                     disabled={loading}
@@ -147,7 +146,7 @@ export const LoginForm = () => {
                             </div>
 
                             <div className="mt-6 grid grid-cols-3 gap-3">
-                                <Button className="bg-white border-r-gray-400 hover:border hover:bg-accent">
+                                <Button className="bg-white border-r-gray-400 hover:border hover:bg-accent" onClick={googleAuth}>
                                     <FcGoogle />
                                 </Button>
                                 <Button className="bg-white border-r-gray-400 hover:border text-blue hover:bg-accent">

@@ -1,14 +1,14 @@
 // hooks/useUser.ts
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { UserService,  } from "@/services/user.services";
-import type { User } from "@/types/type";
+import { UserService, } from "@/services/user.services";
+import type { UserEntity } from "@/types/type";
 
 export function useUser() {
-  return useQuery<User>({
+  return useQuery<UserEntity>({
     queryKey: ["me"],
     queryFn: UserService.me,
     staleTime: 60_000,                 // ภายใน 1 นาทีถือว่ายัง “สด” → ไม่ยิงซ้ำ
-    retry: (count, err:any) => {
+    retry: (count, err: any) => {
       if (err?.response?.status === 404) {
         return false;
       }
@@ -17,6 +17,9 @@ export function useUser() {
     refetchOnWindowFocus: true,
   });
 }
+
+
+
 
 export function useInvalidateUser() {
   const qc = useQueryClient();

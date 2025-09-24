@@ -1,39 +1,41 @@
-import { UserRepo, UserCreateInput, UserUpdateInput } from "@/repos/user.repo";
+import { UserRepo, UserUpdateInput } from "@/repos/user.repo";
+import { UserData } from "@/controller/user.controller";
 import bcrypt from "bcryptjs";
-import { BAD_REQUEST } from "@/constants/http";
+import { BAD_REQUEST, CONFLICT, NOT_FOUND } from "@/constants/http";
 import { RoleRepo } from "@/repos/role.repo";
 import { INTERNAL_SERVER_ERROR } from "@/constants/http";
 import { AppError } from "@/utils/appError";
-
+import { UserCreateInput, UserCreateReturn, UserListResult } from "@/types/user";
+import { role } from "@/constants/type";
 
 export const UserService = {
     // CREATE
-    async createUser(input: Omit<UserCreateInput, "password"> & { password: string }) {
+    async createUser(input: UserCreateInput, role:role):Promise<UserCreateReturn> {
         try {
-            const role = await RoleRepo.findByName('user');
-            if (!role?.id) {
-                throw new AppError("ROLE_NOT_FOUND", INTERNAL_SERVER_ERROR, "ROLE_NOT_FOUND");
-            }
+                const userrole = await RoleRepo.findByName(role);
+                if (!userrole?.id) 
+                    throw new AppError("ROLE_NOT_FOUND", INTERNAL_SERVER_ERROR, "ROLE_NOT_FOUND");
 
-            const createData: UserCreateInput = {
-                email: input.email,
-                fname: input.fname,
-                lname: input.lname,
-                password: input.password,
-                roleId: role.id,
-            };
+                const createData: UserCreateInput = {
+                    email: input.email,
+                    fname: input.fname,
+                    lname: input.lname,
+                    password: input.password,
+                    roleId: userrole.id,
+                };
 
-            const user = await UserRepo.create(createData);
-            console.log(`From user service`, user.fname);
-            return user;
+                const user = await UserRepo.create(createData);
+                console.log(`From user service`, user.fname);
+                return user;
         } catch (e: any) {
             // Prisma unique constraint
             if (e?.code === "P2002" && e?.meta?.target?.includes("email")) {
-                throw new AppError("EMAIL_TAKEN", 409, "EMAIL_TAKEN");
+                throw new AppError("EMAIL_TAKEN", CONFLICT, "EMAIL_TAKEN");
             }
             throw e;
         }
     },
+
 
     getUserById(id: string) {
         return UserRepo.findById(id);
@@ -47,8 +49,8 @@ export const UserService = {
         return UserRepo.findByEmail(email);
     },
 
-    listUsers(page?: number, pageSize?: number) {
-        return UserRepo.list(page, pageSize);
+    async listUsers(page?: number, pageSize?: number):Promise<UserListResult> {
+        return await UserRepo.list(page, pageSize);
     },
 
     // UPDATE
@@ -59,10 +61,10 @@ export const UserService = {
         } catch (e: any) {
             if (e?.code === "P2025") {
                 // record not found
-                throw new AppError("USER_NOT_FOUND", 404, "USER_NOT_FOUND");
+                throw new AppError("USER_NOT_FOUND", NOT_FOUND, "USER_NOT_FOUND");
             }
             if (e?.code === "P2002" && e?.meta?.target?.includes("email")) {
-                throw new AppError("EMAIL_TAKEN", 409, "EMAIL_TAKEN");
+                throw new AppError("EMAIL_TAKEN", CONFLICT, "EMAIL_TAKEN");
             }
             throw e;
         }

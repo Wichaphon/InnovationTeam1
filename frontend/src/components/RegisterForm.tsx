@@ -1,4 +1,3 @@
-import axios from "axios"
 import { IoPerson } from "react-icons/io5";
 import { FaUserTag } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
@@ -9,42 +8,50 @@ import { FaSquareFacebook } from "react-icons/fa6";
 import { IoLogoGithub } from "react-icons/io";
 import { Button } from "@/components/ui/button"
 import type React from "react";
-import { useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 
-export interface UserFormData{
-    fname?:string;
-    lname?:string;
-    email:string;
-    password:string;
+export interface UserAuthData {
+    fname?: string;
+    lname?: string;
+    email: string;
+    password: string;
 }
 
 
 export const RegisterForm = () => {
-    const [formData, setFormData] = useState<UserFormData>({
-        fname:'',
-        lname:'',
-        email:'',
-        password:'',
+    const [formData, setFormData] = useState<UserAuthData>({
+        fname: "",
+        lname: "",
+        email: "",
+        password: "",
     });
-    const [loading,setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
+    // const [loading,setIsLoading] = useState<boolean>(false);
+    const { loading, register, googleAuth } = useAuth();
+    const nav = useNavigate();
 
-    const handleChange =  (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]:e.target.value,
-        })
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.currentTarget;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
     }
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
-        setError(null);
-        setSuccess(null);
+        try {
+            console.log(`Data was send`, formData);
+            await register(formData);
+            nav("/login");
+        } catch (error) {
+            console.log('Error', error);
+        }
     }
+
 
     return (
         <div className="w-full max-w-md">
@@ -68,6 +75,7 @@ export const RegisterForm = () => {
                                         <IoPerson />
                                     </div>
                                     <input
+                                        name="fname"
                                         type="text"
                                         className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                                         placeholder="John"
@@ -84,6 +92,7 @@ export const RegisterForm = () => {
                                         <FaUserTag />
                                     </div>
                                     <input
+                                        name="lname"
                                         type="text"
                                         className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                                         placeholder="Doe"
@@ -101,6 +110,7 @@ export const RegisterForm = () => {
                                     <MdEmail />
                                 </div>
                                 <input
+                                    name="email"
                                     type="email"
                                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                                     placeholder="john.doe@example.com"
@@ -117,6 +127,7 @@ export const RegisterForm = () => {
                                     <RiLockPasswordLine />
                                 </div>
                                 <input
+                                    name="password"
                                     type="password"
                                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                                     placeholder="••••••••"
@@ -167,13 +178,13 @@ export const RegisterForm = () => {
                             className="w-full bg-gradient-to-r from-primary to-secondary"
                         >
                             {loading ? (
-                            <>
-                                <h2>
-                                    Creating...
-                                </h2>
-                            </>
+                                <>
+                                    <h2>
+                                        Creating...
+                                    </h2>
+                                </>
                             ) : (
-                            "Create Account"
+                                "Create Account"
                             )}
                         </Button>
                     </form>
@@ -189,7 +200,7 @@ export const RegisterForm = () => {
                         </div>
 
                         <div className="mt-6 grid grid-cols-3 gap-3">
-                            <Button className="bg-white border-r-gray-400 hover:border">
+                            <Button className="bg-white border-r-gray-400 hover:border" onClick={googleAuth}>
                                 <FcGoogle />
                             </Button>
                             <Button className="bg-white border-r-gray-400 hover:border text-blue">
@@ -204,8 +215,8 @@ export const RegisterForm = () => {
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
-                            Already have an account?
-                            <a href="#" className="font-medium text-primary hover:text-secondary transition-colors">Sign in</a>
+                            Already have an account ?
+                            <a href="/login" className="font-medium text-primary hover:text-secondary transition-colors">  Sign in</a>
                         </p>
                     </div>
                 </div>

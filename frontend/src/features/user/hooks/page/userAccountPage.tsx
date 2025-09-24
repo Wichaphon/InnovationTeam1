@@ -1,26 +1,23 @@
-import React, { use, useEffect, useState } from 'react'
 import { useUser } from '@/features/user/hooks/useUser';
-import DashboardComponent from '@/components/DashBoard';
-import type { User } from '@/types/type';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarProvider } from '@/components/ui/sidebar';
+import type { UserEntity } from '@/types/type';
 
-const mock: User = {
+const mock: UserEntity = {
   id: "12345",
   email: "doe@gmail.com",
   fname: "John",
   lname: "doe",
-  role:{
-    name:"user"
+  role: {
+    name: "user"
   }
 }
 
-export const AccountPage = () => {
+export const UserAccountPage = () => {
   const { data: user, isLoading, error, refetch } = useUser();
   if (isLoading) return <div>Loading profile...</div>
   if (error) {
     const err = error as any;
     const status = err?.response?.status;
-    const message =
+    const message = err?.response.message;
       err?.response?.data?.message ||
       (status === 404 ? "User not found" : err.message);
 
@@ -57,19 +54,19 @@ export const AccountPage = () => {
           <div className='space-y-0.5'>
             <div className='text-gray-500 text-sm'>country</div>
             <div>Fill for address</div>
-          </div>  
+          </div>
         </div>
       </div>
       {/* name column */}
       <div className="flex flex-col pt-10 justify-start">
-      <div className='flex flex-col space-y-4'>
+        <div className='flex flex-col space-y-4'>
           <div className='space-y-0.5'>
             <div className='text-gray-500 text-sm'>Name</div>
             <p>{user?.fname} {user?.lname}</p>
           </div>
           <div className='space-y-0.5'>
             <div className='text-gray-500 text-sm'>Role</div>
-            <p>{user?.role.name}</p>
+            <p>{user?.role?.name}</p>
           </div>
           <div className='space-y-0.5'>
             <div className='text-gray-500 text-sm'>Email</div>
@@ -78,7 +75,7 @@ export const AccountPage = () => {
           <div className='space-y-0.5'>
             <div className='text-gray-500 text-sm'>ID</div>
             <div>{user?.id}</div>
-          </div>  
+          </div>
         </div>
       </div>
       {/* document column */}

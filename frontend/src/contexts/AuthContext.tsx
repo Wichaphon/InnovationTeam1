@@ -1,13 +1,19 @@
 // contexts/AuthContext.tsx
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, use, useContext, useState, type ReactNode } from "react";
 import { api, API_URL } from "@/services/api";
 import axios from "axios";
-import type { User } from "@/types/type";
+import type { UserCreateInput, UserEntity } from "@/types/type";
+import { AuthService } from "@/services/auth.services";
+import { useUser } from "@/features/user/hooks/useUser";
+import type { UserAuthData } from "@/components/RegisterForm";
+import { useNavigate } from "react-router-dom";
 
 type AuthCtx = {
   loading: boolean;
-  register: (user:User) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  user?: UserEntity | null;
+  register: (user: UserAuthData) => void;
+  login: (userinput: UserAuthData) => Promise<void>;
+  googleAuth: () => void
   logout: () => Promise<void>;
   refreshAccessToken: () => Promise<void>;
 };
@@ -15,40 +21,24 @@ type AuthCtx = {
 const AuthContext = createContext<AuthCtx | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const nav = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  async function register(user:User){
-        try {
-          const res = axios.post(`${process.env.API_URL}/auth/register`,user,{
-              headers: {
-                  'Content-Type':'application/json'
-              },
-          });
-          console.log('Register Success Full', (await res).data);
-          return (await res).data;
-      } 
-      catch (error) {
-          if (axios.isAxiosError(error)) {
-              console.error('Error', error.response?.data?.message ?? error.message);
-          }
-          else if (error instanceof Error) {
-              console.error('Error', error.message);
-            } 
-          else {
-              console.error('Unknown error', error);
-          }
-      }
-  }
-
-  async function login(email: string, password: string) {
+  async function register(user: UserAuthData) {
     setLoading(true);
     try {
-      const res = await api.post("/auth/login", { email, password });
-      const {success,data} = await res.data;
-      const {accessToken} = data;
-      if (accessToken) sessionStorage.setItem("access_token", accessToken);
-      console.log(`status from backend ${success}`);
-      // refresh token อยู่ใน HttpOnly cookie (browser จัดการเอง)
+      await AuthService.register(user);
+    }
+    finally {
+      setLoading(false);
+    }
+  }
+
+  async function login(userinput:UserAuthData) {
+    setLoading(true);
+    try {
+      const sucess = await AuthService.loginLocal(userinput.email, userinput.password) as boolean;
+      if (sucess) nav('/account')
     } finally {
       setLoading(false);
     }
@@ -57,26 +47,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     setLoading(true);
     try {
-      await api.post("/auth/logout"); // server เคลียร์ refresh cookie
+      await AuthService.logout();
     } finally {
-      sessionStorage.removeItem("access_token");
       setLoading(false);
     }
   }
 
+  function googleAuth() {
+    window.location.href = `${API_URL}/auth/google`;
+  }
+
   async function refreshAccessToken() {
-    const { data } = await axios.post(
-      `${API_URL}/auth/refresh`,
-      {},
-      { withCredentials: true }
-    );
-    const access = data?.accessToken ?? data?.access_token;
-    if (!access) throw new Error("No access token from refresh");
-    sessionStorage.setItem("access_token", access);
+    setLoading(true);
+    try {
+      await AuthService.refreshToken();
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ loading, register, login, logout, refreshAccessToken }}>
+    <AuthContext.Provider value={{ loading, register, login, googleAuth, logout, refreshAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

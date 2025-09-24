@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import type { User } from '@/types/type';
+import type { UserEntity } from '@/types/type';
 
 interface DashBoardProps {
-  user?: User;
+  user?: UserEntity;
 }
 
 // Define types

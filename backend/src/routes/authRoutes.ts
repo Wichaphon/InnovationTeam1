@@ -1,9 +1,10 @@
 import express, { Router } from 'express';
-import { login, register, refresh, logout } from '@/controller/auth.controller';
+import { login, register, refresh, logout, googleCallback, googleFailureHandle as googleFailureHandler, authgoogle, frontend_tmp } from '@/controller/auth.controller';
 import { validateRegister, validateLogin } from '@/middlewares/validation';
 import { loggingMiddleware } from '@/middlewares/logging';
 import rateLimit from 'express-rate-limit';
 import { validate } from '@/middlewares/validation';
+import passport from '@/config/passport';
 
 const authRoute = Router();
 
@@ -14,10 +15,16 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-authRoute.post('/register', limiter, validateRegister, register);
-authRoute.post('/login', limiter, validateLogin, login);
-authRoute.post('/refresh', limiter, validateLogin, refresh);
-authRoute.post('/logout', limiter, validateLogin, logout);
-
+authRoute.use(limiter)
+authRoute.post('/register', validateRegister, register);
+authRoute.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+authRoute.get('/google/callback', 
+  passport.authenticate('google', { 
+  session: false, 
+  failureRedirect: '/auth/google/failed' }), googleCallback);
+authRoute.get('/google/failed', googleFailureHandler);
+authRoute.post('/login', validateLogin, login);
+authRoute.post('/refresh', refresh);
+authRoute.post('/logout', validateLogin, logout);
 
 export default authRoute;

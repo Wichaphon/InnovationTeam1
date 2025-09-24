@@ -1,10 +1,15 @@
 // services/user.service.ts
 import { api } from "@/services/api";
-import type { User } from "@/types/type";
+import type { UserEntity } from "@/types/type";
 
 export const UserService = {
-    me: async (): Promise<User> => {
-        const {data} = await api.get('/user/profile');
-        return data;
+    me: async (): Promise<UserEntity> => {
+        const res = await api.get('/user/profile');
+        return res.data;
     },
+
+    all: async (): Promise<UserEntity[]> => {
+        const { data } = await api.get('/user')
+        return data;
+    }
 };

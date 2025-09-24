@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 export const API_URL = import.meta.env.API_URL || "http://localhost:5000";
 
 export const api = axios.create({
@@ -8,8 +9,19 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use((config) => {
-  const at = sessionStorage.getItem("access_token");
-  if (at) config.headers.Authorization = `Bearer ${at}`;
-  return config;
+api.interceptors.response.use(undefined, async (error) => {
+  const originalRequest = error.config;
+
+  if (error.response?.status === 401 && !originalRequest._retry) {
+    originalRequest._retry = true;
+    try {
+      await api.post('/auth/refresh');
+      return api(originalRequest);
+    } catch {
+      // logout หรือ redirect
+    }
+  }
+
+  return Promise.reject(error);
 });
+

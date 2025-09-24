@@ -1,7 +1,22 @@
+import { Express } from "express";
+
 export interface AuthPayload {
-    userId: string;
+    id: string;
 }
 
-export interface AuthedRequest extends Request{
-    user?: AuthPayload & {role  ?:string}
+export interface AuthRequest extends Request {
+    user?: Express.User;
+}
+
+export type role = "admin" | "user";
+
+export interface refreshToken {
+    id: string;
+    iat: number;
+    exp: number;
+}
+
+export type returnToken = {
+    success:boolean | true;
+    accessToken:string;
 }
